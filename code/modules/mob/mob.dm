@@ -35,9 +35,7 @@
 			var/mob/dead/observe = M
 			observe.reset_perspective(null)
 	qdel(hud_used)
-	for(var/cc in client_colours)
-		qdel(cc)
-	client_colours = null
+	QDEL_LIST(client_colours)
 	ghostize()
 	..()
 	return QDEL_HINT_HARDDEL
@@ -342,14 +340,14 @@
 
 	if(!slot_priority)
 		slot_priority = list( \
-			SLOT_BACK, SLOT_WEAR_ID,\
-			SLOT_W_UNIFORM, SLOT_WEAR_SUIT,\
-			SLOT_WEAR_MASK, SLOT_HEAD, SLOT_NECK,\
-			SLOT_SHOES, SLOT_GLOVES,\
-			SLOT_EARS, SLOT_GLASSES,\
-			SLOT_BELT, SLOT_S_STORE,\
-			SLOT_L_STORE, SLOT_R_STORE,\
-			SLOT_GENERC_DEXTROUS_STORAGE\
+			ITEM_SLOT_BACK, ITEM_SLOT_ID,\
+			ITEM_SLOT_ICLOTHING, ITEM_SLOT_OCLOTHING,\
+			ITEM_SLOT_MASK, ITEM_SLOT_HEAD, ITEM_SLOT_NECK,\
+			ITEM_SLOT_FEET, ITEM_SLOT_GLOVES,\
+			ITEM_SLOT_EARS, ITEM_SLOT_EYES,\
+			ITEM_SLOT_BELT, ITEM_SLOT_SUITSTORE,\
+			ITEM_SLOT_LPOCKET, ITEM_SLOT_RPOCKET,\
+			ITEM_SLOT_DEX_STORAGE\
 		)
 
 	for(var/slot in slot_priority)
@@ -917,7 +915,7 @@
   */
 /mob/buckle_mob(mob/living/M, force = FALSE, check_loc = TRUE)
 	if(M.buckled)
-		return 0
+		return FALSE
 	var/turf/T = get_turf(src)
 	if(M.loc != T)
 		var/old_density = density
@@ -925,7 +923,7 @@
 		var/can_step = step_towards(M, T)
 		density = old_density
 		if(!can_step)
-			return 0
+			return FALSE
 	return ..()
 
 ///Call back post buckle to a mob to offset your visual height

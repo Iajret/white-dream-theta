@@ -1,7 +1,7 @@
 	////////////
 	//SECURITY//
 	////////////
-#define UPLOAD_LIMIT		1048576	//Restricts client uploads to the server to 1MB //Could probably do with being lower.
+#define UPLOAD_LIMIT		6291456	//Restricts client uploads to the server to 6MB //Could probably do with being lower. //THETA incrase from 1 to 6
 
 GLOBAL_LIST_INIT(blacklisted_builds, list(
 	"1407" = "bug preventing client display overrides from working leads to clients being able to see things/mobs they shouldn't be able to see",
@@ -61,7 +61,7 @@ GLOBAL_LIST_INIT(blacklisted_builds, list(
 				topiclimiter[ADMINSWARNED_AT] = minute
 				msg += " Administrators have been informed."
 				log_game("[key_name(src)] Has hit the per-minute topic limit of [mtl] topic calls in a given game minute")
-				message_admins("[ADMIN_LOOKUPFLW(src)] [ADMIN_KICK(usr)] Has hit the per-minute topic limit of [mtl] topic calls in a given game minute")
+				message_admins("[ADMIN_LOOKUPFLW(usr)] [ADMIN_KICK(usr)] Has hit the per-minute topic limit of [mtl] topic calls in a given game minute")
 			to_chat(src, "<span class='danger'>[msg]</span>")
 			return
 
@@ -390,7 +390,7 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 		if (nnpa >= 0)
 			message_admins("New user: [key_name_admin(src)] is connecting here for the first time.")
 			if (CONFIG_GET(flag/irc_first_connection_alert))
-				send2irc_adminless_only("New-user", "[key_name(src)] is connecting for the first time!")
+				send2tgs_adminless_only("New-user", "[key_name(src)] is connecting for the first time!")
 	else if (isnum(cached_player_age) && cached_player_age < nnpa)
 		message_admins("New user: [key_name_admin(src)] just connected with an age of [cached_player_age] day[(player_age==1?"":"s")]")
 	if(CONFIG_GET(flag/use_account_age_for_jobs) && account_age >= 0)
@@ -398,7 +398,7 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 	if(account_age >= 0 && account_age < nnpa)
 		message_admins("[key_name_admin(src)] (IP: [address], ID: [computer_id]) is a new BYOND account [account_age] day[(account_age==1?"":"s")] old, created on [account_join_date].")
 		if (CONFIG_GET(flag/irc_first_connection_alert))
-			send2irc_adminless_only("new_byond_user", "[key_name(src)] (IP: [address], ID: [computer_id]) is a new BYOND account [account_age] day[(account_age==1?"":"s")] old, created on [account_join_date].")
+			send2tgs_adminless_only("new_byond_user", "[key_name(src)] (IP: [address], ID: [computer_id]) is a new BYOND account [account_age] day[(account_age==1?"":"s")] old, created on [account_join_date].")
 	get_message_output("watchlist entry", ckey)
 	check_ip_intel()
 	validate_key_in_db()
@@ -483,9 +483,7 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 				"Forever alone :("\
 			)
 
-			send2irc("Server", "[cheesy_message] (No admins online)")
-
-	player_details.achievements.save()
+			send2tgs("Server", "[cheesy_message] (No admins online)")
 
 	GLOB.ahelp_tickets.ClientLogout(src)
 	GLOB.directory -= ckey
@@ -688,7 +686,7 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 
 			if (!cidcheck_failedckeys[ckey])
 				message_admins("<span class='adminnotice'>[key_name(src)] has been detected as using a cid randomizer. Connection rejected.</span>")
-				send2irc_adminless_only("CidRandomizer", "[key_name(src)] has been detected as using a cid randomizer. Connection rejected.")
+				send2tgs_adminless_only("CidRandomizer", "[key_name(src)] has been detected as using a cid randomizer. Connection rejected.")
 				cidcheck_failedckeys[ckey] = TRUE
 				note_randomizer_user()
 
@@ -699,7 +697,7 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 		else
 			if (cidcheck_failedckeys[ckey])
 				message_admins("<span class='adminnotice'>[key_name_admin(src)] has been allowed to connect after showing they removed their cid randomizer</span>")
-				send2irc_adminless_only("CidRandomizer", "[key_name(src)] has been allowed to connect after showing they removed their cid randomizer.")
+				send2tgs_adminless_only("CidRandomizer", "[key_name(src)] has been allowed to connect after showing they removed their cid randomizer.")
 				cidcheck_failedckeys -= ckey
 			if (cidcheck_spoofckeys[ckey])
 				message_admins("<span class='adminnotice'>[key_name_admin(src)] has been allowed to connect after appearing to have attempted to spoof a cid randomizer check because it <i>appears</i> they aren't spoofing one this time</span>")
@@ -790,10 +788,10 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 				msg += " Administrators have been informed."
 				if (ab)
 					log_game("[key_name(src)] is using the middle click aimbot exploit")
-					message_admins("[ADMIN_LOOKUPFLW(src)] [ADMIN_KICK(usr)] is using the middle click aimbot exploit</span>")
+					message_admins("[ADMIN_LOOKUPFLW(usr)] [ADMIN_KICK(usr)] is using the middle click aimbot exploit</span>")
 					add_system_note("aimbot", "Is using the middle click aimbot exploit")
 				log_game("[key_name(src)] Has hit the per-minute click limit of [mcl] clicks in a given game minute")
-				message_admins("[ADMIN_LOOKUPFLW(src)] [ADMIN_KICK(usr)] Has hit the per-minute click limit of [mcl] clicks in a given game minute")
+				message_admins("[ADMIN_LOOKUPFLW(usr)] [ADMIN_KICK(usr)] Has hit the per-minute click limit of [mcl] clicks in a given game minute")
 			to_chat(src, "<span class='danger'>[msg]</span>")
 			return
 
@@ -958,4 +956,4 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 
 
 /client/proc/give_award(achievement_type, mob/user)
-	return	player_details.achievements.unlock(achievement_type, mob/user)
+	return	player_details.achievements.unlock(achievement_type, user)

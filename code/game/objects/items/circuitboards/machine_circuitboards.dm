@@ -388,7 +388,24 @@
 	build_path = /obj/machinery/holopad
 	req_components = list(/obj/item/stock_parts/capacitor = 1)
 	needs_anchored = FALSE //wew lad
+	var/secure = FALSE
 
+/obj/item/circuitboard/machine/holopad/attackby(obj/item/P, mob/user, params)
+	if(P.tool_behaviour == TOOL_MULTITOOL)
+		if(secure)
+			build_path = /obj/machinery/holopad
+			secure = FALSE
+		else
+			build_path = /obj/machinery/holopad/secure
+			secure = TRUE
+		to_chat(user, "<span class='notice'>You [secure? "en" : "dis"]able the security on the [src]</span>")
+	. = ..()
+
+/obj/item/circuitboard/machine/holopad/examine(mob/user)
+	. = ..()
+	. += "There is a connection port on this board that could be <b>pulsed</b>"
+	if(secure)
+		. += "There is a red light flashing next to the word \"secure\""
 
 /obj/item/circuitboard/machine/launchpad
 	name = "Bluespace Launchpad (Machine Board)"
@@ -678,7 +695,7 @@
 	name = "Medical Kiosk (Machine Board)"
 	icon_state = "medical"
 	build_path = /obj/machinery/medical_kiosk
-	var/custom_cost = 5
+	var/custom_cost = 10
 	req_components = list(
 		/obj/item/healthanalyzer = 1,
 		/obj/item/stock_parts/scanning_module = 1)
@@ -686,9 +703,10 @@
 /obj/item/circuitboard/machine/medical_kiosk/multitool_act(mob/living/user)
 	. = ..()
 	var/new_cost = input("Set a new cost for using this medical kiosk.","New cost", custom_cost) as num|null
-	if(new_cost == null)
+	if(new_cost == null && (src.loc == user))
 		return
-	custom_cost = CLAMP(round(new_cost, 1), 1, 1000)
+	custom_cost = CLAMP(round(new_cost, 1), 10, 1000)
+	to_chat(user, "<span class='notice'>The cost is now set to [custom_cost].</span>")
 
 /obj/item/circuitboard/machine/medical_kiosk/examine(mob/user)
 	. = ..()
@@ -854,7 +872,7 @@
 /obj/item/circuitboard/machine/public_nanite_chamber/multitool_act(mob/living/user)
 	. = ..()
 	var/new_cloud = input("Set the public nanite chamber's Cloud ID (1-100).", "Cloud ID", cloud_id) as num|null
-	if(new_cloud == null)
+	if(new_cloud && (src.loc == user))
 		return
 	cloud_id = CLAMP(round(new_cloud, 1), 1, 100)
 
